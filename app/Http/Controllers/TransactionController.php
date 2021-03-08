@@ -53,6 +53,18 @@ class TransactionController extends Controller
         }
     }
 
+    public function show($id)
+    {
+
+        $transaction = Transaction::findOrFail($id);
+        $response = [
+            'message' => 'Detail Of Transaction resource',
+            'data' => $transaction,
+        ];
+        return response()->json($response, Response::HTTP_OK);
+
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -64,7 +76,7 @@ class TransactionController extends Controller
     {
 
         $transaction = Transaction::findOrFail($id);
-        
+
         $validator = Validator::make($request->all(), [
             'title' => ['required'],
             'amount' => ['required', 'numeric'],
@@ -92,14 +104,23 @@ class TransactionController extends Controller
 
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
-        //
+
+        $transaction = Transaction::findOrFail($id);
+
+        try {
+            $transaction->delete($transaction);
+            $response = [
+                'message' => 'Transaction Deleted',
+            ];
+            return response()->json($response, Response::HTTP_OK);
+
+        } catch (QueryException $e) {
+            return response()->json([
+                'message' => "Failed " . $e->errorInfo,
+            ]);
+        }
+
     }
 }
